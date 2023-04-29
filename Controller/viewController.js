@@ -12,37 +12,29 @@ exports.getViewData = async (req, res) => {
         const { name } = req.params;
 
         const userData = await User.findOne({ username: name });
-        if (!userData) {
-            return res.status(404).json({
-                status: "error",
-                message: "User not found",
-            });
-        }
+        const id = userData?._id
 
-        const id = userData._id;
-        // galleryData, menuData,musicData,
-        const [commonData, socialData, locationData, messageData] = await Promise.all([
-            common.find({ userInfo: [id] }),
-            social.find({ userInfo: [id] }),
-            // gallery.find({ userInfo: [id] }),
-            // menu.find({ userInfo: [id] }),
-            location.find({ userInfo: [id] }),
-            // music.find({ userInfo: [id] }),
-            message.find({ userInfo: [id] }),
-        ]);
-        // galleryData, menuData,musicData,
-        const result = { userData, commonData, socialData, locationData, messageData };
+        const commonData = await common.find({ userInfo: [id] })
+        const socialData = await social.find({ userInfo: [id] })
+        const galleryData = await gallery.find({ userInfo: [id] })
+        const menuData = await menu.find({ userInfo: [id] })
+        const locationData = await location.find({ userInfo: [id] })
+        const musicData = await music.find({ userInfo: [id] })
+
+        const messageData = await message.find({ userInfo: [id] })
+
+        const result = { userData, commonData, socialData, galleryData, menuData, locationData, musicData, messageData }
 
         res.status(200).json({
             status: "success",
-            message: "Data fetched successfully",
+            message: "Data get successfully",
             data: result,
         });
 
     } catch (error) {
         res.status(400).json({
             status: "error",
-            message: "Data couldn't be fetched",
+            message: "Data couldn't get",
             error: error.message,
         });
     }
